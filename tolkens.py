@@ -11,4 +11,7 @@ class tolkens:
     def removeTolken(self, tolken):
         self.tolken.remove(tolken)
 
+    def getAllTolkens(self):
+        return self.tolken
+
     

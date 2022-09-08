@@ -1,5 +1,3 @@
-
-
 class symbolTable:
 
     def __init__(self):
@@ -28,12 +26,20 @@ class symbolTable:
 
 
 
-    def getSymbol(self, index):
-        return (self.symbols[index])[0]
+    def getSymbol(self, index, type):
+        if type is 'PRE':
+            return (self.specialWords[index])
+        else:
+            return (self.symbols[index])
 
     def insertSymbol(self, symbol):
-        self.symbols.append([symbol])
-        return len(self.symbols) - 1
+        if  (self.specialWords.count(symbol) > 0):
+            return self.specialWords.index(symbol)
+        elif (self.symbols.count(symbol) > 0):
+            return self.symbols.index(symbol)
+        else:
+            self.symbols.append(symbol)
+            return self.symbols.index(symbol)
 
     def verifyReservedWord(self, symbol):
-        return (self.symbols.count(symbol) > 0)
+        return (self.specialWords.count(symbol) > 0)
