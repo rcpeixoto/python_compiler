@@ -3,6 +3,28 @@ class symbolTable:
     def __init__(self):
         self.symbols = []
         self.specialWords = []
+        self.reserverWords = {
+            "var": "var",
+            "const": "const",
+            "struct": "struct",
+            "extends": "extends",
+            "procedure": "procedure",
+            "function": "function",
+            "start": "start",
+            "return": "return",
+            "if": "if",
+            "else": "else",
+            "then": "then",
+            "while": "while",
+            "read": "read",
+            "print": "print",
+            "int": "int",
+            "real": "real",
+            "boolean": "boolean",
+            "string": "string",
+            "true": "true",
+            "false": "false",
+        }
         self.specialWords.append("var")
         self.specialWords.append("const")
         self.specialWords.append("struct")
@@ -24,8 +46,6 @@ class symbolTable:
         self.specialWords.append("true")
         self.specialWords.append("false")
 
-
-
     def getSymbol(self, index, type):
         if type is 'PRE':
             return (self.specialWords[index])
@@ -33,7 +53,7 @@ class symbolTable:
             return (self.symbols[index])
 
     def insertSymbol(self, symbol):
-        if  (self.specialWords.count(symbol) > 0):
+        if (self.specialWords.count(symbol) > 0):
             return self.specialWords.index(symbol)
         elif (self.symbols.count(symbol) > 0):
             return self.symbols.index(symbol)
