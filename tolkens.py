@@ -4,8 +4,8 @@ class tolkens:
         self.tolken = []
 
 
-    def createTolken(self, value, index=''):
-        entry = (value, index)
+    def createTolken(self, value, line, index=''):
+        entry = [value, index, line]
         self.tolken.append(entry)
     
     def removeTolken(self, tolken):
@@ -14,4 +14,6 @@ class tolkens:
     def getAllTolkens(self):
         return self.tolken
 
+    def lastTolken(self):
+        return (self.tolken[len(self.tolken)-1])
     
