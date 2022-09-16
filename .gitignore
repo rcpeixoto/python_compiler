@@ -5,4 +5,7 @@ env
 *.pyc
 
 #Ignora arquivos da pasta file
-file/*
+files/*
+
+#Ignora pasta __pycache__
+__pycache__

@@ -11,7 +11,7 @@ class lexicalAnalyzer:
         self.states = ['initial_state', 'identifier', 'digit', 'float_digit',
                        'ponctuation_symbol', 'negative_num', 'artih_-', 'artith_+',
                        'logical_operator', 'delimiter', 'relational_1', 'relational_2',
-                        'digit_space', 'start_comment', 'line_comment', 'block_comment', 'end_comment']
+                        'digit_space', 'start_comment', 'line_comment', 'block_comment', 'end_comment', 'string']
         self.currentState = self.states[0]
         self.letters = list(string.ascii_letters)
         self.digits = list(string.digits)
@@ -31,8 +31,22 @@ class lexicalAnalyzer:
             symbol = ''
             line = line + ' '
             for i in range(0, len(line) - 1):
+                
+                if line[i] is '"' or  self.currentState is self.states[17]:
+                    print(line [i])
+                    if (self.currentState is self.states[0] and line[i] is '"') or (self.currentState is self.states[17] and (line[i] in self.letters or line[i] in self.digits or (line[i] in self.ponctuation and not line[i] is '"'))):                        
+                        print(line[i] in self.ponctuation and not line[i] is '"')
+                        symbol = symbol + line[i]
+                    elif self.currentState is self.states[17] and line[i] is '"':
+                        print("entrou na criacao")
+                        symbol = symbol + line[i]
+                        self.token.createtoken(
+                        'CAC', j, self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
+                        self.currentState = self.states[0]
+                    self.currentState = self.states[17]
 
-                if line[i] in self.letters:
+                elif line[i] in self.letters:
 
                     # Starts reading a identifier, begining with a letter
                     if self.currentState is self.states[0] or self.currentState is self.states[1]:
@@ -105,7 +119,7 @@ class lexicalAnalyzer:
                                 'ART', j, self.symbolTable.insertSymbol(symbol.strip()))
                         symbol = ''
                         self.currentState = self.states[0]
-    
+          
                 # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
 
@@ -124,9 +138,9 @@ class lexicalAnalyzer:
                         self.currentState = self.states[0]
 
                     # Reading a Identifier, then finds a ponctuation symbol which is not "_"
-                    # Finish reading and save tolken
+                    # Finish reading and save token
                     if self.currentState is self.states[1] and line[i] is not '_':
-                        # Verifies whether the tolken represents a Reserved word
+                        # Verifies whether the token represents a Reserved word
                         if self.symbolTable.verifyReservedWord(symbol):
                             self.token.createtoken(
                                 'PRE', j, self.symbolTable.insertSymbol(symbol))
@@ -210,8 +224,6 @@ class lexicalAnalyzer:
                             symbol = ''
                             self.currentState = self.states[0]
 
-
-
                     elif line[i] in self.relational:
                         if self.currentState is self.states[0]:
                             self.currentState = self.states[10]
@@ -227,7 +239,6 @@ class lexicalAnalyzer:
                             'LOG', j,self.symbolTable.insertSymbol(symbol))
                             symbol = ''
 
-
                     elif line[i] in self.delimiters:
                         if self.currentState is self.states[6] or self.currentState is self.states[7] or self.currentState is self.states[13]:
                             self.token.createtoken('ART',j, self.symbolTable.insertSymbol(symbol))
@@ -236,6 +247,7 @@ class lexicalAnalyzer:
                         'DEL',j, self.symbolTable.insertSymbol(symbol))
                         symbol = ''
                         self.currentState = self.states[0]
+            
         f.close()
 
     def printar(self):
@@ -244,12 +256,12 @@ class lexicalAnalyzer:
     def printtokens(self):
         f = open(self.file + '-saida.txt', 'w')
         token = self.token.getAlltoken()
-        for tolken in token:
-            f.write(str(tolken[2]) + ' ' + tolken[0] + ' ' +
-                    self.symbolTable.getSymbol(tolken[1], tolken[0]) + '\n')
+        for token in token:
+            f.write(str(token[2]) + ' ' + token[0] + ' ' +
+                    self.symbolTable.getSymbol(token[1], token[0]) + '\n')
         f.close()
 
 
 if __name__ == '__main__':
-    lexicalAnalyzer = lexicalAnalyzer("./file/entrada.txt")
+    lexicalAnalyzer = lexicalAnalyzer("./files/entrada.txt")
     lexicalAnalyzer.printar()
