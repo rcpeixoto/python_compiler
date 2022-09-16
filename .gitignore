@@ -1,0 +1,5 @@
+#Ingorar pasta env
+env
+
+#Ignora arquivos com a extensão .pyc
+*.pyc

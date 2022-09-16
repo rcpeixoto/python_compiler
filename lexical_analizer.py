@@ -1,5 +1,5 @@
 
-from curses.ascii import isspace
+
 from symbol_table import symbolTable
 from tokens import tokens
 import string
@@ -12,7 +12,7 @@ class lexicalAnalyzer:
         self.symbolTable = symbolTable()
         self.tokens = tokens()
         self.states = ['initial_state', 'identifier', 'digit',
-                       'float_digit', 'ponctuation_symbol', 'dash']
+                       'float_digit', 'ponctuation_symbol', 'dash', 'logical_operator']
         self.currentState = self.states[0]
 
         self.letters = list(string.ascii_letters)
@@ -69,10 +69,13 @@ class lexicalAnalyzer:
                             self.tokens.createtoken(
                                 'IDE', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
+                    elif self.currentState is self.states[6]:
+                        self.tokens.createToken('LOG', self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
                         # Reads a symbol after identifier
                     self.currentState = self.states[0]
 
-                elif line[i] is '\n' or line[i] is '\t':
+                elif line[i] == '\n' or line[i] == '\t':
                     if self.currentState is self.states[1]:
                         if self.symbolTable.verifyReservedWord(symbol):
                             self.tokens.createtoken(
@@ -83,13 +86,16 @@ class lexicalAnalyzer:
                     elif self.currentState is self.states[2] or self.currentState is self.states[3]:
                         self.tokens.createtoken(
                             'NRO', self.symbolTable.insertSymbol(symbol))
+                    elif self.currentState is self.states[6]:
+                        self.tokens.createToken('LOG', self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
                     self.currentState = self.states[0]
 
                 # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
                     # Reading a Identifier, then finds a ponctuation symbol which is not "_"
                     # Finish reading and save token
-                    if self.currentState is self.states[1] and line[i] is not '_':
+                    if self.currentState == self.states[1] and line[i] != '_':
                         # Verifies whether the token represents a Reserved word
                         if self.symbolTable.verifyReservedWord(symbol):
                             self.tokens.createtoken(
@@ -104,7 +110,7 @@ class lexicalAnalyzer:
 
                     # Reading a float digit, then finds a ponctuation symbol
                     # Saves token
-                    elif self.currentState is self.states[3]:
+                    elif self.currentState == self.states[3]:
                         self.tokens.createtoken(
                             'NRO', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
@@ -113,26 +119,35 @@ class lexicalAnalyzer:
                         symbol = symbol + line[i]
 
                     # Starts reading of a negative digit
-                    elif line[i] is '-':
-                        if self.currentState is self.states[0]:
+                    elif line[i] == '-':
+                        if self.currentState == self.states[0]:
                             self.currentState = self.states[5]
                             symbol = symbol + line[i]
 
                     # Starts reading of a '.'
-                    elif line[i] is '.':
+                    elif line[i] == '.':
                         # if the reading is current in a digit, the '.' is seen as a float point divisor
-                        if self.currentState is self.states[2]:
+                        if self.currentState == self.states[2]:
                             self.currentState = self.states[3]
                             symbol = symbol + line[i]
 
                     # starts reading of a '_'
-                    elif line[i] is '_':
+                    elif line[i] == '_':
                         # If the reading is current in a identifier, the '_' is seen as part of the identifier
-                        if self.currentState is self.states[1]:
+                        if self.currentState == self.states[1]:
                             symbol = symbol + line[i]
 
+                elif line[i] is "!" or line[i] is "&" or line[i] is "|": 
+                    if self.currentState == self.states[0]:
+                        self.currentState = self.states[6]
+                        symbol = symbol + line[i]
+                    if self.currentState == self.states[6] and ((line[i] is "&" and symbol == "&") or (line[i] is "|" and symbol == "|")):
+                        symbol = symbol + line[i]
         f.close()
-
+        
+    def printar(self):
+        print(self.ponctuation)
+    
     def printtokens(self):
         f = open(self.file + '-saida.txt', 'w')
         tokens = self.tokens.getAlltokens()
@@ -140,3 +155,7 @@ class lexicalAnalyzer:
             f.write(
                 token[0] + ' ' + self.symbolTable.getSymbol(token[1], token[0]) + '\n')
         f.close()
+
+if __name__ == '__main__':
+    lexicalAnalyzer = lexicalAnalyzer("C:\Python27")
+    lexicalAnalyzer.printar()
