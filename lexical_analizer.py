@@ -1,8 +1,9 @@
 
-from curses.ascii import isspace
+
 from symbol_table import symbolTable
-from tolkens import tolkens
+from tokens import tokens
 import string
+
 
 class lexicalAnalyzer:
 
@@ -12,10 +13,8 @@ class lexicalAnalyzer:
         self.tolkens = tolkens()
         self.states = ['initial_state','identifier', 'digit', 'float_digit', 
                         'ponctuation_symbol', 'negative_num', 'logical_-', 'logical_+', 
-                        'arith_1', 'arith_2', 'relational_1', 'relational_2', 'digit_space']
+                        'arith_1', 'arith_2', 'relational_1', 'relational_2', 'digit_space', 'logical_operator', 'delimiter']
         self.currentState = self.states[0]
-        
-
         self.letters = list(string.ascii_letters)
         self.digits = list(string.digits)
         self.ponctuation = list(string.punctuation)
@@ -42,8 +41,8 @@ class lexicalAnalyzer:
                         self.currentState = self.states[1]
                         symbol = symbol + line[i]
 
-                    #Reading digit then finds a letter
-                    #Finish reading and saves tolken
+                    # Reading digit then finds a letter
+                    # Finish reading and saves token
                     elif self.currentState is self.states[2] or self.currentState is self.states[3]:
                         #ERROR
                         a = 1
@@ -64,8 +63,7 @@ class lexicalAnalyzer:
                         symbol = symbol + line[i]
                     #if not, it can be anything TEMPORALY
                     else:
-                        symbol= symbol + line[i]
-
+                        symbol = symbol + line[i]
 
                 elif line[i].isspace():
                     if self.currentState is self.states[2] or self.currentState is self.states[3]:
@@ -102,9 +100,7 @@ class lexicalAnalyzer:
                         self.tolkens.createTolken('NRO',i, self.symbolTable.insertSymbol(symbol))
                     self.currentState = self.states[0]
 
-
-                        
-                #Reads a ponctuation symbol
+                # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
                     
                     if (self.currentState is self.states[2] or self.currentState is self.states[3]) and line[i] is not '.':
@@ -186,9 +182,22 @@ class lexicalAnalyzer:
 
         f.close()
 
-    def printTolkens(self):
+        #        elif line[i] is (";" or "," or "(" or ")" or "[" or "]" or "{" or "}" or "."):
+        #            if self.currentState is self.states[0]:
+        #                self.currentState = self.states[7]
+        #                symbol = symbol + line[i]
+        #f.close()
+        
+    def printar(self):
+        print(self.ponctuation)
+    
+    def printtokens(self):
         f = open(self.file + '-saida.txt', 'w')
         tolkens = self.tolkens.getAllTolkens()
         for tolken in tolkens:
             f.write(str(tolken[2]) + ' ' +tolken[0] + ' ' + self.symbolTable.getSymbol(tolken[1], tolken[0]) + '\n')
         f.close()
+
+if __name__ == '__main__':
+    lexicalAnalyzer = lexicalAnalyzer("./file/entrada.txt")
+    lexicalAnalyzer.printar()

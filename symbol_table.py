@@ -2,39 +2,38 @@ class symbolTable:
 
     def __init__(self):
         self.symbols = []
-        self.specialWords = []
-        self.specialWords.append("var")
-        self.specialWords.append("const")
-        self.specialWords.append("struct")
-        self.specialWords.append("extends")
-        self.specialWords.append("procedure")
-        self.specialWords.append("function")
-        self.specialWords.append("start")
-        self.specialWords.append("return")
-        self.specialWords.append("if")
-        self.specialWords.append("else")
-        self.specialWords.append("then")
-        self.specialWords.append("while")
-        self.specialWords.append("read")
-        self.specialWords.append("print")
-        self.specialWords.append("int")
-        self.specialWords.append("real")
-        self.specialWords.append("boolean")
-        self.specialWords.append("string")
-        self.specialWords.append("true")
-        self.specialWords.append("false")
-
-
+        self.reserverWords = {
+            "var": "var",
+            "const": "const",
+            "struct": "struct",
+            "extends": "extends",
+            "procedure": "procedure",
+            "function": "function",
+            "start": "start",
+            "return": "return",
+            "if": "if",
+            "else": "else",
+            "then": "then",
+            "while": "while",
+            "read": "read",
+            "print": "print",
+            "int": "int",
+            "real": "real",
+            "boolean": "boolean",
+            "string": "string",
+            "true": "true",
+            "false": "false",
+        }
 
     def getSymbol(self, index, type):
         if type is 'PRE':
-            return (self.specialWords[index])
+            return (self.reserverWords[index])
         else:
             return (self.symbols[index])
 
     def insertSymbol(self, symbol):
-        if  (self.specialWords.count(symbol) > 0):
-            return self.specialWords.index(symbol)
+        if symbol in self.reserverWords.keys():
+            return self.reserverWords[symbol]
         elif (self.symbols.count(symbol) > 0):
             return self.symbols.index(symbol)
         else:
@@ -42,4 +41,4 @@ class symbolTable:
             return self.symbols.index(symbol)
 
     def verifyReservedWord(self, symbol):
-        return (self.specialWords.count(symbol) > 0)
+        return symbol in self.reserverWords.keys()
