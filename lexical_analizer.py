@@ -11,10 +11,8 @@ class lexicalAnalyzer:
         self.file = filePath
         self.symbolTable = symbolTable()
         self.tokens = tokens()
-        self.states = ['initial_state', 'identifier', 'digit',
-                       'float_digit', 'ponctuation_symbol', 'dash', 'logical_operator']
+        self.states = ['initial_state', 'identifier', 'digit','float_digit', 'ponctuation_symbol', 'dash', 'logical_operator', 'delimiter']
         self.currentState = self.states[0]
-
         self.letters = list(string.ascii_letters)
         self.digits = list(string.digits)
         self.ponctuation = list(string.punctuation)
@@ -72,10 +70,13 @@ class lexicalAnalyzer:
                     elif self.currentState is self.states[6]:
                         self.tokens.createToken('LOG', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
-                        # Reads a symbol after identifier
+                    elif self.currentState is self.states[7]:
+                        self.tokens.createToken('DEL', self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
+                    # Reads a symbol after identifier
                     self.currentState = self.states[0]
 
-                elif line[i] == '\n' or line[i] == '\t':
+                elif line[i] is '\n' or line[i] is '\t':
                     if self.currentState is self.states[1]:
                         if self.symbolTable.verifyReservedWord(symbol):
                             self.tokens.createtoken(
@@ -88,6 +89,9 @@ class lexicalAnalyzer:
                             'NRO', self.symbolTable.insertSymbol(symbol))
                     elif self.currentState is self.states[6]:
                         self.tokens.createToken('LOG', self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
+                    elif self.currentState is self.states[7]:
+                        self.tokens.createToken('DEL', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
                     self.currentState = self.states[0]
 
@@ -138,10 +142,15 @@ class lexicalAnalyzer:
                             symbol = symbol + line[i]
 
                 elif line[i] is "!" or line[i] is "&" or line[i] is "|": 
-                    if self.currentState == self.states[0]:
+                    if self.currentState is self.states[0]:
                         self.currentState = self.states[6]
                         symbol = symbol + line[i]
-                    if self.currentState == self.states[6] and ((line[i] is "&" and symbol == "&") or (line[i] is "|" and symbol == "|")):
+                    if self.currentState is self.states[6] and ((line[i] is "&" and symbol is "&") or (line[i] is "|" and symbol is "|")):
+                        symbol = symbol + line[i]
+
+                elif line[i] is (";" or "," or "(" or ")" or "[" or "]" or "{" or "}" or "."):
+                    if self.currentState is self.states[0]:
+                        self.currentState = self.states[7]
                         symbol = symbol + line[i]
         f.close()
         
@@ -157,5 +166,5 @@ class lexicalAnalyzer:
         f.close()
 
 if __name__ == '__main__':
-    lexicalAnalyzer = lexicalAnalyzer("C:\Python27")
+    lexicalAnalyzer = lexicalAnalyzer("./file/entrada.txt")
     lexicalAnalyzer.printar()

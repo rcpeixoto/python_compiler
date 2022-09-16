@@ -3,3 +3,6 @@ env
 
 #Ignora arquivos com a extensão .pyc
 *.pyc
+
+#Ignora arquivos da pasta file
+file/*
