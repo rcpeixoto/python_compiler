@@ -10,7 +10,8 @@ class lexicalAnalyzer:
         self.token = tokens()
         self.states = ['initial_state', 'identifier', 'digit', 'float_digit',
                        'ponctuation_symbol', 'negative_num', 'artih_-', 'artith_+',
-                       'logical_operator', 'delimiter', 'relational_1', 'relational_2', 'digit_space',]
+                       'logical_operator', 'delimiter', 'relational_1', 'relational_2',
+                        'digit_space', 'start_comment', 'line_comment', 'block_comment', 'end_comment']
         self.currentState = self.states[0]
         self.letters = list(string.ascii_letters)
         self.digits = list(string.digits)
@@ -63,7 +64,7 @@ class lexicalAnalyzer:
                     else:
                         symbol = symbol + line[i]
 
-                elif line[i].isspace():
+                elif line[i].isspace() or line[i] is '\t':
                     if self.currentState is self.states[2] or self.currentState is self.states[3]:
                         if symbol[0] is '-' and self.token.lastTolken()[0] is 'NRO' and self.token.lastTolken()[2] == j:
                             symbol_1 = symbol[0]
@@ -91,19 +92,23 @@ class lexicalAnalyzer:
                         self.token.createTolken(
                             'ART', j, self.symbolTable.insertSymbol(symbol))
                         symbol = ''
+                        self.currentState = self.states[0]
                     elif self.currentState is self.states[8]:
                         self.tokens.createToken(
                             'LOG', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
+                        self.currentState = self.states[0]
 
-                elif line[i] is '\n' or line[i] is '\t':
+                elif line[i] is '\n':
                     if self.currentState is self.states[1]:
                         if self.symbolTable.verifyReservedWord(symbol):
                             self.token.createTolken(
                                 'PRE', j, self.symbolTable.insertSymbol(symbol))
+                            self.currentState = self.states[0]
                         else:
                             self.token.createTolken(
                                 'IDE', j, self.symbolTable.insertSymbol(symbol))
+                            self.currentState = self.states[0]
                     elif self.currentState is self.states[2] or self.currentState is self.states[3]:
                         if symbol[0] is '-' and self.token.lastTolken()[0] is 'NRO' or self.token.lasttoken()[2] is j:
                             symbol_1 = symbol[0]
@@ -112,11 +117,22 @@ class lexicalAnalyzer:
                                 'ART', j, self.symbolTable.insertSymbol(symbol_1))
                             self.token.createTolken(
                                 'NRO', j, self.symbolTable.insertSymbol(symbol_2))
+                        else:
+                            self.token.createTolken(
+                                'NRO', j, self.symbolTable.insertSymbol(symbol))
+                        symbol = ''
+                        self.currentState = self.states[0]
                     elif self.currentState is self.states[8]:
                         self.tokens.createToken(
                             'LOG', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
-
+                        self.currentState = self.states[0]
+                    elif self.currentState is self.states[14]:
+                        self.currentState = self.states[0]
+                        symbol = ''
+                    elif self.currentState is self.states[15]:
+                        self.currentState = self.states[15]
+                        symbol = ''
                 # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
 
@@ -183,7 +199,27 @@ class lexicalAnalyzer:
                                 'ART', j, self.symbolTable.insertSymbol(symbol.strip()))
                             symbol = ''
                             self.currentState = self.states[0]
-
+                        elif self.currentState is self.states[0] and line[i] is '/':
+                            self.currentState = self.states[13]
+                            symbol = symbol + line[i]
+                        elif self.currentState is self.states[13] and line[i] is '/':
+                            self.currentState = self.states[14]
+                            symbol = ''
+                        elif self.currentState is self.states[13] and line[i] is '*':
+                            self.currentState = self.states[15]
+                            symbol = ''
+                        elif self.currentState is self.states[15] and line[i] is '*':
+                            self.currentState = self.states[16]
+                            symbol = ''
+                        elif self.currentState is self.states[16] and line[i] is '/':
+                            self.currentState = self.states[0]
+                            symbol = ''
+                        elif self.currentState is self.states[16] and line[i] is not '/':
+                            if line[i] is '*':
+                                self.currentState = self.states[16]
+                            else:
+                                self.currentState = self.states[15]
+                            symbol = ''
                         else:
                             if symbol.strip() is '-':
                                 self.token.createTolken(
@@ -205,6 +241,10 @@ class lexicalAnalyzer:
                             symbol = symbol + line[i]
                         if self.currentState is self.states[8] and ((line[i] is "&" and symbol is "&") or (line[i] is "|" and symbol is "|")):
                             symbol = symbol + line[i]
+                            self.tokens.createToken(
+                            'LOG', self.symbolTable.insertSymbol(symbol))
+                            symbol = ''
+
 
                     elif line[i] in self.delimiters:
                         if self.currentState is self.states[0]:
