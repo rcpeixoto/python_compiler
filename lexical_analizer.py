@@ -40,14 +40,15 @@ class lexicalAnalyzer:
                     if (self.currentState is self.states[0] and line[i] is '"') or (self.currentState is self.states[21] and (line[i] in self.letters or line[i] in self.digits or (line[i] in self.ponctuation and not line[i] is '"'))):                        
                         print(line[i] in self.ponctuation and not line[i] is '"')
                         symbol = symbol + line[i]
-                    elif self.currentState is self.states[21] and line[i] is '"':
+                        self.currentState = self.states[21]
+                    elif self.currentState is self.states[21] and line[i] is '"' and not symbol is '"':
                         print("entrou na criacao")
                         symbol = symbol + line[i]
                         self.token.createtoken(
                         'CAC', j, self.symbolTable.insertSymbol(symbol))
                         symbol = ''
                         self.currentState = self.states[0]
-                    self.currentState = self.states[21]
+                    
 
                 if line[i] in self.letters:
                     if self.currentState is self.states[18] or self.currentState is self.states[19] or self.currentState is self.states[20]:
@@ -147,8 +148,6 @@ class lexicalAnalyzer:
                                 'ART', j, self.symbolTable.insertSymbol(symbol.strip()))
                         symbol = ''
                         self.currentState = self.states[0]
-          
-                # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
 
                     if (self.currentState is self.states[2] or self.currentState is self.states[3]) and line[i] is not '.':
@@ -332,6 +331,9 @@ class lexicalAnalyzer:
                         symbol = ''
                         self.currentState = self.states[0]
             
+            if self.currentState is self.states[21]:
+                self.token.createtoken('CMF', j, self.symbolTable.insertSymbol(symbol))
+                self.currentState = self.states[0]
         f.close()
 
     def printar(self):
