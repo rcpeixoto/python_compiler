@@ -95,11 +95,6 @@ class lexicalAnalyzer:
                         self.tokens.createToken(
                             'LOG', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
-                    elif self.currentState is self.states[9]:
-                        self.tokens.createToken(
-                            'DEL', self.symbolTable.insertSymbol(symbol))
-                        symbol = ''
-                        self.currentState = self.states[0]
 
                 elif line[i] is '\n' or line[i] is '\t':
                     if self.currentState is self.states[1]:
@@ -121,11 +116,6 @@ class lexicalAnalyzer:
                         self.tokens.createToken(
                             'LOG', self.symbolTable.insertSymbol(symbol))
                         symbol = ''
-                    elif self.currentState is self.states[9]:
-                        self.tokens.createToken(
-                            'DEL', self.symbolTable.insertSymbol(symbol))
-                        symbol = ''
-                    self.currentState = self.states[0]
 
                 # Reads a ponctuation symbol
                 elif line[i] in self.ponctuation:
@@ -220,6 +210,10 @@ class lexicalAnalyzer:
                         if self.currentState is self.states[0]:
                             self.currentState = self.states[9]
                             symbol = symbol + line[i]
+                            self.tokens.createToken(
+                            'DEL', self.symbolTable.insertSymbol(symbol))
+                            symbol = ''
+                            self.currentState = self.states[0]
         f.close()
 
     def printar(self):
