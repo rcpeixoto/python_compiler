@@ -12,7 +12,7 @@ class lexicalAnalyzer:
                        'ponctuation_symbol', 'negative_num', 'artih_-', 'artith_+',
                        'logical_operator&', 'logical_operator|', 'relational_1', 'relational_2',
                         'digit_space', 'start_comment', 'line_comment', 'block_comment', 'end_comment',
-                        'different', 'equal', 'greater', 'smaller']
+                        'different', 'equal', 'greater', 'smaller', 'string']
         self.currentState = self.states[0]
         self.letters = list(string.ascii_letters)
         self.digits = list(string.digits)
@@ -50,7 +50,8 @@ class lexicalAnalyzer:
                     if self.currentState is self.states[0] or self.currentState is self.states[1]:
                         self.currentState = self.states[1]
                         symbol = symbol + line[i]
-
+                    elif self.currentState is self.states[21]:
+                        symbol = symbol + line[i]
                     # Reading digit then finds a letter
                     # Finish reading and saves token
                     elif self.currentState is self.states[2] or self.currentState is self.states[3]:
@@ -74,6 +75,8 @@ class lexicalAnalyzer:
                         self.token.createtoken('LOG',j, self.symbolTable.insertSymbol(symbol))
                         self.currentState = self.states[0]
                         symbol = ''
+                    elif self.currentState is self.states[21]:
+                        symbol = symbol + line[i]
                     # if the digit read is in initial_state, then it must be a number
                     elif self.currentState is self.states[0] or self.currentState is self.states[5] or self.currentState is self.states[6] or self.currentState is self.states[3]:
                         self.currentState = self.states[2]
@@ -87,6 +90,8 @@ class lexicalAnalyzer:
                         self.token.createtoken('REL',j, self.symbolTable.insertSymbol(symbol))
                         self.currentState = self.states[0]
                         symbol = ''
+                    elif self.currentState is self.states[21]:
+                        symbol = symbol + line[i]
                     elif self.currentState is self.states[17]:
                         self.token.createtoken('LOG',j, self.symbolTable.insertSymbol(symbol))
                         self.currentState = self.states[0]
@@ -166,7 +171,13 @@ class lexicalAnalyzer:
                         self.currentState = self.states[0]
 
                     # Starts reading of a '.'
-                    if line[i] is '.':
+                    if self.currentState is self.states[21]:
+                        symbol = symbol + line[i]
+                        if line[i] is '"':
+                            self.token.createtoken('CAC',j, self.symbolTable.insertSymbol(symbol))
+                            self.currentState = self.states[0]
+                            symbol = ''
+                    elif line[i] is '.':
                         # if the reading is current in a digit, the '.' is seen as a float point divisor
                         if self.currentState is self.states[2]:
                             self.currentState = self.states[3]
@@ -177,6 +188,11 @@ class lexicalAnalyzer:
                         # If the reading is current in a identifier, the '_' is seen as part of the identifier
                         if self.currentState is self.states[1]:
                             symbol = symbol + line[i]
+
+                    elif self.currentState is self.states[0] and line[i] is '"':
+                        self.currentState = self.states[21]
+                        symbol = symbol + line[i]
+                        
 
                     elif line[i] in self.arithmetic:
                         if self.currentState is self.states[18] or self.currentState is self.states[19] or self.currentState is self.states[20]:
@@ -326,10 +342,10 @@ class lexicalAnalyzer:
 
     def printtokens(self):
         f = open(self.file + '-saida.txt', 'w')
-        token = self.token.getAlltoken()
-        for tolken in token:
-            f.write(str(tolken[2]) + ' ' + tolken[0] + ' ' +
-                    self.symbolTable.getSymbol(tolken[1], tolken[0]) + '\n')
+        tokens = self.token.getAlltoken()
+        for token in tokens:
+            f.write(str(token[2]) + ' ' + token[0] + ' ' +
+                    self.symbolTable.getSymbol(token[1], token[0]) + '\n')
         f.close()
 
 

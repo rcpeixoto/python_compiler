@@ -1,7 +1,11 @@
 int var numb 1
 - 12.5
-ui var1+++ab - a--+(( /*++--- 
-for 92.3 */333.33 
+ui var1+++ab_2, ->>!= =! >= <=, a== 2= ! a||b 2&&, a--+(( ++--- 
+for 92.3 333.33 
+11 -     2
+"asdasd   _dasds"
+"asdasd" "ds()*&_=[]adasdasdasd"
+
 
 
 
