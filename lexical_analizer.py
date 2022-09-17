@@ -47,12 +47,12 @@ class lexicalAnalyzer:
                 symbol = ''
             line = line + ' '
             for i in range(0, len(line) - 1):
-
+                
                 if self.currentState is (self.states[15] or self.states[16]):
                     symbol = symbol + line[i]
                 if self.currentState is self.states[3] and (line[i] in self.letters or line[i] in self.ponctuation):
                     self.currentState = self.states[22]
-
+                # Starts reading a identifier, begining with a letter
                 if line[i] in self.letters:
                     if self.currentState is self.states[18] or self.currentState is self.states[19] or self.currentState is self.states[20]:
                             self.token.createtoken('REL',j, self.symbolTable.insertSymbol(symbol))
@@ -62,8 +62,6 @@ class lexicalAnalyzer:
                         self.token.createtoken('LOG',j, self.symbolTable.insertSymbol(symbol))
                         self.currentState = self.states[0]
                         symbol = ''
-
-                    # Starts reading a identifier, begining with a letter
                     if self.currentState is self.states[3]:
                         symbol = symbol + line[i]
                         self.error.append(str(j) + ' NMF ' + symbol + '\n')
@@ -80,8 +78,6 @@ class lexicalAnalyzer:
                         symbol = ''
                     elif self.currentState is self.states[21]:
                         symbol = symbol + line[i]
-                    # Reading digit then finds a letter
-                    # Finish reading and saves token
                     elif self.currentState is self.states[2] or self.currentState is self.states[3]:
                         symbol = symbol + line[i]
                         self.currentState = self.states[22]
@@ -108,14 +104,12 @@ class lexicalAnalyzer:
                         symbol = ''
                     elif self.currentState is self.states[22] or self.currentState is self.states[23] or self.currentState is self.states[21]:
                         symbol = symbol + line[i]
-                    # if the digit read is in initial_state, then it must be a number
                     elif self.currentState is self.states[0] or self.currentState is self.states[5] or self.currentState is self.states[6] or self.currentState is self.states[3]:
                         self.currentState = self.states[2]
                         symbol = symbol + line[i]
-                    # if not, it can be anything TEMPORALY
                     else:
                         symbol = symbol + line[i]
-
+                #Reads a space
                 elif line[i].isspace() or line[i] is '\t':
                     if self.currentState is self.states[18] or self.currentState is self.states[19] or self.currentState is self.states[20]:
                         self.token.createtoken('REL',j, self.symbolTable.insertSymbol(symbol))
@@ -158,7 +152,6 @@ class lexicalAnalyzer:
                                 'IDE', j, self.symbolTable.insertSymbol(symbol))
                         symbol = ''
                         self.currentState = self.states[0]
-                        # Reads a symbol after identifier
                     elif self.currentState is self.states[7]:
                         self.token.createtoken(
                             'ART', j, self.symbolTable.insertSymbol(symbol))
